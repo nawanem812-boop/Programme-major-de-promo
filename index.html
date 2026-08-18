@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2F6F63">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Programme Major">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+<title>Dossier de Semaine Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDEFEC;
+    --paper:#FFFFFF;
+    --paper-line:#DDE1DC;
+    --ink:#1E2422;
+    --ink-soft:#5B655F;
+    --teal:#2F6F63;
+    --teal-soft:#E4EEEA;
+    --amber:#B8792E;
+    --amber-soft:#F5EADA;
+    --brick:#A94A34;
+    --brick-soft:#F5E4DE;
+    --shadow: 0 1px 2px rgba(30,36,34,0.06), 0 4px 14px rgba(30,36,34,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:16px 14px 0;}
+
+  .chart-header{
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    border-radius:10px;
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+    position:relative;
+  }
+  .chart-header::before{
+    content:"DOSSIER — SEMAINE TEST";
+    position:absolute;
+    top:-9px; left:16px;
+    background:var(--teal);
+    color:#fff;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.11em;
+    padding:3px 8px;
+    border-radius:4px;
+    font-weight:600;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:8px 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.5;}
+  .field-row{display:flex;gap:10px;margin-top:8px;}
+  .field{flex:1;}
+  .field label{
+    display:block;font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;letter-spacing:0.06em;color:var(--ink-soft);
+    text-transform:uppercase;margin-bottom:3px;
+  }
+  .field input{
+    width:100%;border:none;border-bottom:1.5px solid var(--paper-line);
+    background:transparent;font-family:'IBM Plex Mono',monospace;
+    font-size:13px;padding:3px 0;color:var(--ink);
+  }
+  .field input:focus{outline:none;border-bottom-color:var(--teal);}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .tab{
+    flex:1 1 29%;padding:9px 4px;text-align:center;
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:8px;font-size:12px;font-weight:600;
+    cursor:pointer;color:var(--ink-soft);transition:all .15s;
+  }
+  .tab.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+  .daynav{display:flex;gap:4px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+  .daybtn{
+    flex-shrink:0;padding:7px 12px;border-radius:20px;
+    border:1px solid var(--paper-line);background:var(--paper);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+    color:var(--ink-soft);cursor:pointer;
+  }
+  .daybtn.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+  .day-label{
+    font-family:'Fraunces',serif;font-size:18px;font-weight:600;
+    margin:2px 0 10px;
+  }
+  .hint{font-size:11px;color:var(--ink-soft);margin:-4px 0 10px;font-style:italic;}
+  .block{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:9px;padding:11px 13px;margin-bottom:8px;
+    display:flex;align-items:flex-start;gap:11px;box-shadow:var(--shadow);
+    cursor:pointer;
+  }
+  .block:active{background:var(--teal-soft);}
+  .block .time{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    color:var(--teal);white-space:nowrap;padding-top:1px;min-width:78px;
+  }
+  .block .title{font-size:13.5px;font-weight:500;line-height:1.4;}
+  .block .info-dot{margin-left:auto;color:var(--paper-line);font-size:15px;flex-shrink:0;}
+  .block.has-detail .info-dot{color:var(--teal);}
+
+  .track-block{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:9px;padding:11px 13px;margin-bottom:7px;
+    display:flex;align-items:center;gap:11px;box-shadow:var(--shadow);
+  }
+  .track-block.checked{background:var(--teal-soft);border-color:var(--teal);}
+  .checkbox{
+    width:20px;height:20px;border-radius:5px;border:1.8px solid var(--paper-line);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:#fff;cursor:pointer;
+  }
+  .track-block.checked .checkbox{background:var(--teal);border-color:var(--teal);}
+  .track-info{flex:1;cursor:pointer;}
+  .track-block .time{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
+  .track-block .title{font-size:13px;font-weight:500;}
+  .track-block.checked .title{color:var(--teal);}
+  .track-block .info-dot{color:var(--teal);font-size:15px;flex-shrink:0;}
+
+  .panel{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:10px;padding:14px 16px;margin:14px 0;box-shadow:var(--shadow);
+  }
+  .panel-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.07em;
+    color:var(--ink-soft);text-transform:uppercase;margin-bottom:8px;font-weight:600;
+  }
+  .scale{display:flex;gap:6px;}
+  .scale-btn{
+    flex:1;padding:9px 0;text-align:center;border-radius:7px;
+    border:1.5px solid var(--paper-line);background:var(--bg);
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;
+    cursor:pointer;color:var(--ink-soft);
+  }
+  .scale-btn.active{background:var(--amber);border-color:var(--amber);color:#fff;}
+  .sommeil-row{display:flex;align-items:center;gap:10px;}
+  .sommeil-row input{
+    width:60px;padding:6px 8px;border-radius:6px;border:1.5px solid var(--paper-line);
+    font-family:'IBM Plex Mono',monospace;font-size:14px;text-align:center;
+  }
+  textarea{
+    width:100%;border:1.5px solid var(--paper-line);border-radius:7px;
+    padding:9px 10px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;
+    resize:vertical;min-height:52px;color:var(--ink);background:var(--bg);
+  }
+  textarea:focus,.scale-btn:focus{outline:none;}
+  .panel.brick .panel-label{color:var(--brick);}
+  .panel.brick textarea{background:var(--brick-soft);border-color:#e2c3b6;}
+  .panel.teal .panel-label{color:var(--teal);}
+  .panel.teal textarea{background:var(--teal-soft);border-color:#c3ddd4;}
+
+  .saved-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--teal);
+    text-align:center;padding:6px 0 0;opacity:0;transition:opacity .3s;
+  }
+  .saved-tag.show{opacity:1;}
+
+  .bilan-row{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:9px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);
+  }
+  .bilan-top{display:flex;justify-content:space-between;align-items:center;}
+  .bilan-day{font-family:'Fraunces',serif;font-weight:600;font-size:15px;}
+  .bilan-pct{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;}
+  .barbg{height:6px;background:var(--paper-line);border-radius:3px;margin-top:7px;overflow:hidden;}
+  .barfill{height:100%;background:var(--teal);border-radius:3px;}
+  .bilan-meta{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+  .bilan-note{font-size:11.5px;color:var(--brick);margin-top:6px;line-height:1.4;}
+
+  /* Méthodes / Conseils cards */
+  .m-card{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+    border-left:3px solid var(--teal);
+  }
+  .m-card h3{font-family:'Fraunces',serif;font-size:15.5px;margin:0 0 8px;font-weight:600;}
+  .m-card .m-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--teal);
+    text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-bottom:3px;}
+  .m-card p{font-size:12.8px;line-height:1.55;margin:4px 0;color:var(--ink);}
+  .m-card p b{color:var(--ink);}
+  .m-card.rule{border-left-color:var(--amber);}
+  .c-card{
+    background:var(--paper);border:1px solid var(--paper-line);
+    border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+  }
+  .c-card h3{font-family:'Fraunces',serif;font-size:15.5px;margin:0 0 8px;font-weight:600;}
+  .c-card p{font-size:12.8px;line-height:1.55;margin:5px 0;color:var(--ink);}
+  .c-card ul{margin:6px 0;padding-left:18px;font-size:12.8px;line-height:1.6;}
+  .flow-line{font-family:'IBM Plex Mono',monospace;background:var(--teal-soft);padding:8px 10px;border-radius:6px;font-size:11.5px;margin:6px 0;color:var(--teal);}
+
+  /* Modal */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,26,24,0.5);
+    z-index:100;align-items:flex-end;justify-content:center;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--paper);border-radius:16px 16px 0 0;padding:20px 20px 26px;
+    max-width:640px;width:100%;max-height:75vh;overflow-y:auto;
+    box-shadow:0 -4px 24px rgba(0,0,0,0.15);
+  }
+  .modal-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);font-weight:600;}
+  .modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:6px 0 12px;}
+  .modal-detail{font-size:13.5px;line-height:1.65;color:var(--ink);white-space:pre-line;}
+  .modal-close{
+    display:block;margin:18px auto 0;padding:9px 24px;border-radius:20px;
+    background:var(--ink);color:#fff;border:none;font-family:'IBM Plex Sans',sans-serif;
+    font-size:13px;font-weight:600;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="chart-header">
+    <h1>Programme Major de Promo</h1>
+    <p class="subtitle">Semaine test avant la rentrée — objectif : voir ce qui tient, ce qui casse, avant que les vrais enjeux arrivent.</p>
+    <div class="field-row">
+      <div class="field">
+        <label>Semaine du</label>
+        <input type="date" id="weekStart">
+      </div>
+      <div class="field">
+        <label>Objectif du test</label>
+        <input type="text" id="testGoal" placeholder="ex: tenir 7j sans dérapage">
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-view="schedule">Emploi du temps</div>
+    <div class="tab" data-view="tracker">Tracker</div>
+    <div class="tab" data-view="bilan">Bilan</div>
+    <div class="tab" data-view="methodes">Méthodes</div>
+    <div class="tab" data-view="conseils">Conseils</div>
+  </div>
+
+  <div class="daynav" id="daynav"></div>
+
+  <div class="view active" id="view-schedule">
+    <div class="day-label" id="sched-day-label"></div>
+    <p class="hint">Touchez un bloc pour voir le détail complet.</p>
+    <div id="sched-blocks"></div>
+  </div>
+
+  <div class="view" id="view-tracker">
+    <div class="day-label" id="track-day-label"></div>
+    <p class="hint">Cochez pour valider · touchez le texte pour voir le détail.</p>
+    <div id="track-blocks"></div>
+
+    <div class="panel">
+      <div class="panel-label">Énergie du jour</div>
+      <div class="scale" id="energyScale">
+        <div class="scale-btn" data-val="1">1</div>
+        <div class="scale-btn" data-val="2">2</div>
+        <div class="scale-btn" data-val="3">3</div>
+        <div class="scale-btn" data-val="4">4</div>
+        <div class="scale-btn" data-val="5">5</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">Sommeil (nuit précédente)</div>
+      <div class="sommeil-row">
+        <input type="number" id="sommeilInput" min="0" max="14" step="0.5" placeholder="0">
+        <span style="font-size:13px;color:var(--ink-soft);">heures</span>
+      </div>
+    </div>
+
+    <div class="panel brick">
+      <div class="panel-label">Ce qui a dérapé</div>
+      <textarea id="derapeInput" placeholder="Quel bloc a sauté ou glissé ? Pourquoi, concrètement ?"></textarea>
+    </div>
+
+    <div class="panel teal">
+      <div class="panel-label">Ce qui a bien marché</div>
+      <textarea id="marcheInput" placeholder="Qu'est-ce qui a tenu sans effort ?"></textarea>
+    </div>
+
+    <div class="saved-tag" id="savedTag">✓ enregistré</div>
+  </div>
+
+  <div class="view" id="view-bilan">
+    <div class="day-label">Bilan de la semaine</div>
+    <div id="bilan-content"></div>
+  </div>
+
+  <div class="view" id="view-methodes">
+    <div class="day-label">Les 5 Méthodes d'Élite</div>
+
+    <div class="m-card rule">
+      <h3>Le cœur du système : les Fiches de Flux</h3>
+      <p><b>Règle 1 — Zéro phrase.</b> Interdiction d'écrire des structures (Sujet + Verbe + Complément). Utilisez exclusivement des mots-clés, des abréviations et des symboles de flux (↑, ↓, →, ⇒, ∅).</p>
+      <p><b>Règle 2 — La logique de cause à effet.</b> Remplacez les paragraphes par des chaînes logiques.</p>
+      <div class="flow-line">Ex : Insuffis. Cardiaque G → ↓ Débit Sang → ↓ Perfusion Rénale → Activation SRAA.</div>
+      <p><b>Règle 3 — Le format Recto-Verso Flash.</b> Créez des fiches bristol minimalistes. Au Recto, un mot-clé ou un schéma vierge (ex : Étapes de l'hémostase ?). Au Verso, la chaîne de flux logique associée. Vous créez un outil de test instantané.</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-sub">M1</div>
+      <h3>Le Tableau Blanc Professionnel — Théorie UPC</h3>
+      <p><b>Principe :</b> Remplacer les fiches papier interminables par une réécriture flash.</p>
+      <p><b>Action :</b> Fermez vos cours, faites face à un grand tableau blanc et réécrivez vos chaînes de flux de mémoire (schémas, flèches, concepts). Corrigez vos erreurs en vert.</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-sub">M2</div>
+      <h3>La Grille d'Évaluation Inversée — Pratique IFSI</h3>
+      <p><b>Principe :</b> Hacker les épreuves pratiques de soins de confort (UE 4.1).</p>
+      <p><b>Action :</b> Transformez les grilles de notation des formateurs de Bichat en check-lists algorithmiques de flux étape par étape (ex : Friction hydro-alcoolique → Posture ergonomique → Pose du matériel...). Répétez le geste de manière robotique.</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-sub">M3</div>
+      <h3>Le Carnet de Liaison Clinique — Stages</h3>
+      <p><b>Principe :</b> Développer un raisonnement d'ex-PASS digne d'un interne en médecine.</p>
+      <p><b>Action :</b> Gardez un carnet de poche dans votre blouse. Notez-y chaque pathologie/médicament croisé à l'hôpital. Le soir, rédigez une chaîne de flux de 3 lignes : Mécanisme → Symptômes → Surveillance clinique.</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-sub">M4</div>
+      <h3>Le Reverse Engineering des QCM — Examens Fac</h3>
+      <p><b>Principe :</b> Anticiper la logique des professeurs de l'Université Paris Cité.</p>
+      <p><b>Action :</b> Au bas de chaque fiche de flux, écrivez en rouge 3 pièges plausibles qu'un enseignant pourrait glisser dans un QCM (inversion de termes dans la chaîne logique, faux synonymes).</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-sub">M5</div>
+      <h3>La Spaced Repetition par Réécriture Minimaliste</h3>
+      <p><b>Principe :</b> Réactiver la mémoire par l'écriture à intervalles fixes pour briser la courbe de l'oubli.</p>
+      <p><b>Action :</b> Réécrivez le cours à J+0 (fiche de flux complète), J+3 (flux de mémoire sur brouillon), J+7 (uniquement les titres et les flèches principales) et J+30 (uniquement le concept central). Vous écrivez de moins en moins pour retenir de plus en plus.</p>
+    </div>
+  </div>
+
+  <div class="view" id="view-conseils">
+    <div class="day-label">Conseils Stratégiques pour Majorer</div>
+
+    <div class="c-card">
+      <h3>🔬 La recherche comme arme intellectuelle</h3>
+      <p>Le contenu quotidien n'a pas besoin d'être directement lié à l'IFSI.</p>
+      <p>L'objectif est de développer :</p>
+      <ul>
+        <li>votre culture générale scientifique et intellectuelle ;</li>
+        <li>votre esprit critique ;</li>
+        <li>votre capacité à analyser une idée ;</li>
+        <li>votre capacité à distinguer données, interprétation et hypothèses ;</li>
+        <li>votre capacité à formuler des questions pertinentes.</li>
+      </ul>
+      <p>La grille Question → Méthode → Résultat → Implications → Idées à retenir → Évolutions possibles transforme une consommation passive de contenu en véritable entraînement intellectuel.</p>
+    </div>
+
+    <div class="c-card">
+      <h3>🎓 Coursera comme investissement secondaire</h3>
+      <p>Deux séances en semaine + dimanche permettent de progresser régulièrement sans transformer les certifications en deuxième cursus universitaire.</p>
+      <p>L'objectif n'est pas d'accumuler dix certificats.</p>
+      <p><b>Une certification terminée et réellement maîtrisée &gt; cinq certifications commencées.</b></p>
+    </div>
+
+    <div class="c-card">
+      <h3>🏋️ Le Sport comme catalyseur</h3>
+      <p>Les 3 séances de salle et 2 de Pilates ne réduisent pas nécessairement votre temps d'étude : elles peuvent contribuer à votre énergie, votre concentration et votre équilibre général.</p>
+      <p>Traitez-les comme des rendez-vous importants, tout en surveillant votre récupération.</p>
+    </div>
+
+    <div class="c-card">
+      <h3>📚 Anticipation de Janvier</h3>
+      <p>Les partiels de l'Université Paris Cité ne pardonnent pas le retard.</p>
+      <p>L'avantage de l'ex-PASS doit se matérialiser par des notes supérieures à 17/20 sur les UE scientifiques (UE 2.1, 2.2) dès le premier semestre pour bétonner votre dossier de réorientation ou de poursuite d'études.</p>
+    </div>
+
+    <div class="c-card">
+      <h3>🧠 La règle ultime</h3>
+      <p>Votre objectif n'est pas de faire le maximum de choses chaque jour.</p>
+      <p>Votre objectif est de construire un système suffisamment solide pour pouvoir le maintenir pendant toute l'année :</p>
+      <div class="flow-line">IFSI → excellence académique<br>UPC → avance<br>Sport → énergie<br>Research → curiosité et esprit critique<br>Coursera → développement professionnel<br>Projets → construction personnelle<br>Repos → récupération</div>
+      <p>Objectif : ne pas simplement être productive pendant trois semaines.</p>
+      <p><b>Objectif : devenir la personne capable de maintenir ce niveau pendant toute l'année.</b></p>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-time" id="modalTime"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-detail" id="modalDetail"></div>
+    <button class="modal-close" id="modalClose">Fermer</button>
+  </div>
+</div>
+
+<script>
+// Persistence: Chrome localStorage keeps tracker data after refresh/reopen.
+const DAYS = [
+  { key:'lundi', label:'Lundi', short:'Lun', blocks:[
+    {t:'07h15–07h45', title:'Routine Recherche & Langues', detail:"20 min : Lecture/visionnage actif d'un contenu au choix : Article scientifique, Article Substack, Vidéo-essai, Article de vulgarisation sérieux, Essai / chapitre.\n\n10 min : Prise de notes et réflexion : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\nImportant : le contenu n'a pas besoin d'être lié à l'IFSI ou à la santé.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'08h30–17h30', title:'Cours à l\u2019IFSI Bichat / Stages'},
+    {t:'17h30–19h00', title:'Bloc d\u2019Ancrage IFSI', detail:"À la BU ou chez soi :\n\n60 min : Méthode 5 & Système de Flux (Fiches Recto-Verso J+0 du jour).\n\n15 min : Méthode 4 (création de 3 pièges QCM en rouge).\n\n15 min : Méthode 2 (flux d'action du TP ou révision des gestes)."},
+    {t:'19h15–20h30', title:'Sport de Haute Performance — Salle', detail:"Exutoire physique pour éliminer le cortisol accumulé durant les cours."},
+    {t:'20h45–21h30', title:'Nutrition Healthy & Cuisine Express', detail:"Préparation d'un repas sain et riche en nutriments pour le soir et le lendemain midi."},
+    {t:'21h30–22h30', title:'Le Bloc Évolution — Créneau Flexible', detail:"Option A — Projets : Code de la route, CV updates & Applications, Création de contenu.\n\nOption B — Détente productive : Piano, Crochet, Lecture."},
+  ]},
+  { key:'mardi', label:'Mardi', short:'Mar', blocks:[
+    {t:'07h15–07h45', title:'Routine Recherche & Langues', detail:"20 min : Lecture/visionnage actif d'un contenu au choix : Article scientifique, Article Substack, Vidéo-essai, Article de vulgarisation sérieux, Essai / chapitre.\n\n10 min : Prise de notes et réflexion : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\nImportant : le contenu n'a pas besoin d'être lié à l'IFSI ou à la santé.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'08h30–17h30', title:'Cours à l\u2019IFSI Bichat / Stages'},
+    {t:'17h30–19h00', title:'Bloc d\u2019Ancrage IFSI', detail:"À la BU ou chez soi :\n\n60 min : Méthode 5 & Système de Flux (Fiches Recto-Verso J+0 du jour).\n\n15 min : Méthode 4 (création de 3 pièges QCM en rouge).\n\n15 min : Méthode 2 (flux d'action du TP ou révision des gestes)."},
+    {t:'19h15–20h30', title:'Sport de Haute Performance — Pilates', detail:"Exutoire physique pour éliminer le cortisol accumulé durant les cours."},
+    {t:'20h45–21h30', title:'Nutrition Healthy & Cuisine Express', detail:"Préparation d'un repas sain et riche en nutriments pour le soir et le lendemain midi."},
+    {t:'21h30–22h30', title:'Le Bloc Évolution — Créneau Flexible', detail:"Option A — Projets : Code de la route, CV updates & Applications, Création de contenu.\n\nOption B — Détente productive : Piano, Crochet, Lecture."},
+  ]},
+  { key:'mercredi', label:'Mercredi', short:'Mer', blocks:[
+    {t:'07h15–07h45', title:'Routine Recherche & Langues', detail:"20 min : Lecture/visionnage actif d'un contenu au choix : Article scientifique, Article Substack, Vidéo-essai, Article de vulgarisation sérieux, Essai / chapitre.\n\n10 min : Prise de notes et réflexion : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\nImportant : le contenu n'a pas besoin d'être lié à l'IFSI ou à la santé.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'08h30–17h30', title:'Cours à l\u2019IFSI Bichat / Stages'},
+    {t:'17h30–19h00', title:'Bloc d\u2019Ancrage IFSI', detail:"À la BU ou chez soi :\n\n60 min : Méthode 5 & Système de Flux (Fiches Recto-Verso J+0 du jour).\n\n15 min : Méthode 4 (création de 3 pièges QCM en rouge).\n\n15 min : Méthode 2 (flux d'action du TP ou révision des gestes)."},
+    {t:'19h15–20h30', title:'Sport de Haute Performance — Salle', detail:"Exutoire physique pour éliminer le cortisol accumulé durant les cours."},
+    {t:'20h45–21h30', title:'Nutrition Healthy & Cuisine Express', detail:"Préparation d'un repas sain et riche en nutriments pour le soir et le lendemain midi."},
+    {t:'21h30–22h30', title:'Le Bloc Évolution — Créneau Flexible', detail:"Option A — Projets : Code de la route, CV updates & Applications, Création de contenu.\n\nOption B — Détente productive : Piano, Crochet, Lecture."},
+  ]},
+  { key:'jeudi', label:'Jeudi', short:'Jeu', blocks:[
+    {t:'08h15–08h45', title:'Routine Recherche & Langues', detail:"20 min : Contenu au choix : article scientifique, Substack, vidéo-essai, etc.\n\n10 min : Notes et réflexion selon la grille : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'09h00–11h00', title:'Prise de Notes Active — Moodle UPC', detail:"Visionner les capsules Moodle de l'UPC (Bio fondamentale, Anatomie).\n\nRédiger directement sous forme de Fiches de Flux."},
+    {t:'11h00–12h00', title:'Méthode 1 — Le Tableau Blanc J+3', detail:"Réécrire de mémoire les flux des cours du lundi et du mardi."},
+    {t:'12h00–13h30', title:'Pause Déjeuner Healthy'},
+    {t:'13h30–14h30', title:'Méthode 2 — Entraînement Gestuel', detail:"Répéter les check-lists algorithmiques de soins (gestes à blanc)."},
+    {t:'14h30–15h30', title:'Méthode 4 — Auto-test QCM', detail:"Se tester sur les pièges à QCM inventés la semaine précédente."},
+    {t:'15h45–17h15', title:'Certification Coursera', detail:"Avancer sur votre certification.\n\nProgression des modules, exercices et évaluations."},
+    {t:'18h00–19h15', title:'Salle de Sport — Session 3/3'},
+    {t:'20h00–22h00', title:'Meal Prep Majeur — Cuisine Healthy', detail:"Session de cuisine en lot pour préparer tous les repas du week-end et du début de semaine suivante.\n\nGain de temps absolu."},
+  ]},
+  { key:'vendredi', label:'Vendredi', short:'Ven', blocks:[
+    {t:'07h15–07h45', title:'Routine Recherche & Langues', detail:"20 min : Contenu intellectuel au choix.\n\n10 min : Notes et réflexion : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'08h30–12h00', title:'Cours du Matin'},
+    {t:'14h00–16h00', title:'Prise de Notes Active', detail:"Fin des capsules UPC en distanciel."},
+    {t:'16h00–17h00', title:'Méthode 1 — Le Tableau Blanc J+3', detail:"Réécrire de mémoire les flux des cours du mercredi et du jeudi."},
+    {t:'17h30–18h30', title:'Pilates — Session 2/2'},
+    {t:'19h00–20h30', title:'Certification Coursera', detail:"Progression de la certification.\n\nFinalisation des quiz et évaluations de la semaine."},
+    {t:'21h00–22h30', title:'Le Bloc Évolution', detail:"Code, CV, Crochet, Piano, Content Creation."},
+  ]},
+  { key:'samedi', label:'Samedi', short:'Sam', blocks:[
+    {t:'08h30–09h00', title:'Routine Recherche & Langues', detail:"20 min : Contenu intellectuel au choix.\n\n10 min : Notes et réflexion : Question, Méthode / approche, Résultat / thèse, Implications, Idées à retenir, Évolutions possibles.\n\n10 min d'application de langues ou lecture du Coran."},
+    {t:'09h00–10h30', title:'Méthode 5 — Spaced Repetition J+7 et J+30', detail:"Réécrire au brouillon la structure minimale des cours d'il y a une semaine et un mois."},
+    {t:'10h30–11h00', title:'Méthode 3 — Carnet de Liaison', detail:"En période de stage : mettre au propre les flux cliniques vus à l'hôpital durant la semaine."},
+    {t:'11h00–12h30', title:'Le Bloc Évolution', detail:"Gros focus CV, Applications, Création de contenu."},
+    {t:'après-midi', title:'Temps libre', detail:"Temps libre, vie sociale ou repos."},
+  ]},
+  { key:'dimanche', label:'Dimanche', short:'Dim', blocks:[
+    {t:'bloc Coursera', title:'Repos + Coursera', detail:"Séance de consolidation/rattrapage Coursera.\n\nFinalisation d'un module ou d'un quiz si nécessaire.\n\nOrganisation de la progression pour la semaine suivante."},
+    {t:'reste du jour', title:'Repos', detail:"Le reste de la journée : repos, vie sociale, loisirs et récupération."},
+  ]},
+];
+
+let currentView = 'schedule';
+let currentDay = 'lundi';
+let cache = {};
+
+function keyFor(day){ return 'tracker:' + day; }
+
+async function loadDay(day){
+  if(cache[day]) return cache[day];
+  try{
+    const raw = localStorage.getItem(keyFor(day));
+    cache[day] = raw ? JSON.parse(raw) : { checked:{}, energy:null, sommeil:'', derape:'', marche:'' };
+  }catch(e){
+    cache[day] = { checked:{}, energy:null, sommeil:'', derape:'', marche:'' };
+  }
+  return cache[day];
+}
+
+async function saveDay(day){
+  try{
+    localStorage.setItem(keyFor(day), JSON.stringify(cache[day]));
+    const tag = document.getElementById('savedTag');
+    tag.classList.add('show');
+    setTimeout(()=>tag.classList.remove('show'), 1200);
+  }catch(e){ console.error('save failed', e); }
+}
+
+async function loadHeader(){
+  try{
+    const raw = localStorage.getItem('header');
+    if(raw){
+      const h = JSON.parse(raw);
+      document.getElementById('weekStart').value = h.weekStart || '';
+      document.getElementById('testGoal').value = h.testGoal || '';
+    }
+  }catch(e){}
+}
+async function saveHeader(){
+  const h = { weekStart: document.getElementById('weekStart').value, testGoal: document.getElementById('testGoal').value };
+  try{ localStorage.setItem('header', JSON.stringify(h)); }catch(e){}
+}
+document.getElementById('weekStart').addEventListener('change', saveHeader);
+document.getElementById('testGoal').addEventListener('input', saveHeader);
+
+function openModal(time, title, detail){
+  document.getElementById('modalTime').textContent = time || '';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDetail').textContent = detail || "Pas de détail supplémentaire pour ce bloc.";
+  document.getElementById('overlay').classList.add('show');
+}
+document.getElementById('modalClose').onclick = ()=> document.getElementById('overlay').classList.remove('show');
+document.getElementById('overlay').onclick = (e)=>{ if(e.target.id==='overlay') e.currentTarget.classList.remove('show'); };
+
+function buildDayNav(){
+  const nav = document.getElementById('daynav');
+  nav.innerHTML = '';
+  DAYS.forEach(d=>{
+    const btn = document.createElement('div');
+    btn.className = 'daybtn' + (d.key===currentDay ? ' active':'');
+    btn.textContent = d.short;
+    btn.onclick = ()=>{ currentDay = d.key; render(); };
+    nav.appendChild(btn);
+  });
+}
+
+function renderSchedule(){
+  const day = DAYS.find(d=>d.key===currentDay);
+  document.getElementById('sched-day-label').textContent = day.label;
+  const box = document.getElementById('sched-blocks');
+  box.innerHTML = '';
+  day.blocks.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'block' + (b.detail ? ' has-detail' : '');
+    el.innerHTML = `<div class="time">${b.t}</div><div><div class="title">${b.title}</div></div><div class="info-dot">${b.detail?'ⓘ':''}</div>`;
+    el.onclick = ()=> openModal(b.t, b.title, b.detail);
+    box.appendChild(el);
+  });
+}
+
+async function renderTracker(){
+  const day = DAYS.find(d=>d.key===currentDay);
+  document.getElementById('track-day-label').textContent = day.label;
+  const data = await loadDay(currentDay);
+  const box = document.getElementById('track-blocks');
+  box.innerHTML = '';
+  day.blocks.forEach((b,i)=>{
+    const checked = !!data.checked[i];
+    const el = document.createElement('div');
+    el.className = 'track-block' + (checked ? ' checked':'');
+    el.innerHTML = `<div class="checkbox">${checked?'✓':''}</div><div class="track-info"><div class="time">${b.t}</div><div class="title">${b.title}</div></div><div class="info-dot">${b.detail?'ⓘ':''}</div>`;
+    el.querySelector('.checkbox').onclick = (e)=>{
+      e.stopPropagation();
+      data.checked[i] = !data.checked[i];
+      renderTracker();
+      saveDay(currentDay);
+    };
+    el.querySelector('.track-info').onclick = ()=> openModal(b.t, b.title, b.detail);
+    box.appendChild(el);
+  });
+
+  document.querySelectorAll('#energyScale .scale-btn').forEach(btn=>{
+    btn.classList.toggle('active', Number(btn.dataset.val)===data.energy);
+    btn.onclick = ()=>{ data.energy = Number(btn.dataset.val); renderTracker(); saveDay(currentDay); };
+  });
+  document.getElementById('sommeilInput').value = data.sommeil || '';
+  document.getElementById('derapeInput').value = data.derape || '';
+  document.getElementById('marcheInput').value = data.marche || '';
+}
+
+document.getElementById('sommeilInput').addEventListener('input', async e=>{
+  const data = await loadDay(currentDay);
+  data.sommeil = e.target.value;
+  saveDay(currentDay);
+});
+document.getElementById('derapeInput').addEventListener('input', async e=>{
+  const data = await loadDay(currentDay);
+  data.derape = e.target.value;
+  saveDay(currentDay);
+});
+document.getElementById('marcheInput').addEventListener('input', async e=>{
+  const data = await loadDay(currentDay);
+  data.marche = e.target.value;
+  saveDay(currentDay);
+});
+
+async function renderBilan(){
+  const box = document.getElementById('bilan-content');
+  box.innerHTML = '<div style="font-size:11.5px;color:var(--ink-soft);font-style:italic;">Chargement…</div>';
+  let html = '';
+  for(const day of DAYS){
+    const data = await loadDay(day.key);
+    const total = day.blocks.length;
+    const done = Object.values(data.checked).filter(Boolean).length;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    html += `<div class="bilan-row">
+      <div class="bilan-top"><div class="bilan-day">${day.label}</div><div class="bilan-pct">${pct}%</div></div>
+      <div class="barbg"><div class="barfill" style="width:${pct}%"></div></div>
+      <div class="bilan-meta">
+        <span>énergie: ${data.energy || '—'}/5</span>
+        <span>sommeil: ${data.sommeil || '—'}h</span>
+      </div>
+      ${data.derape ? `<div class="bilan-note">⚠ ${data.derape}</div>` : ''}
+    </div>`;
+  }
+  box.innerHTML = html;
+}
+
+function render(){
+  buildDayNav();
+  ['schedule','tracker','bilan','methodes','conseils'].forEach(v=>{
+    document.getElementById('view-'+v).classList.toggle('active', currentView===v);
+  });
+  document.getElementById('daynav').style.display = (currentView==='schedule' || currentView==='tracker') ? 'flex' : 'none';
+  if(currentView==='schedule') renderSchedule();
+  else if(currentView==='tracker') renderTracker();
+  else if(currentView==='bilan') renderBilan();
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentView = tab.dataset.view;
+    render();
+  };
+});
+
+loadHeader();
+render();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
